@@ -8,6 +8,23 @@ from app import db
 from ..email import send_email
 from flask_login import current_user
 
+@auth.before_app_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.ping()
+        if not current_user.confirmed \
+                and request.endpoint \
+                and request.blueprint != 'auth' \
+                and request.endpoint != 'static':
+            return redirect(url_for('auth.unconfirmed'))
+
+@auth.route('/unconfirmed')
+def unconfirmed():
+    if current_user.is_anonymous or current_user.confirmed:
+        return redirect(url_for('main.index'))
+    return render_template('auth/unconfirmed.html')
+
+
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -48,26 +65,11 @@ def register():
 def confirm(token):
     if current_user.confirmed:
         return redirect(url_for('main.index'))
-    if current_user.conform(token):
+    if current_user.confirm(token):
         flash('账号完成确认。')
     else:
         flash('账号确认失败。')
     return redirect(url_for('main.index'))
-
-@auth.before_app_request
-def before_request():
-    if current_user.is_authenticated \
-        and not current_user.confirmed \
-        and request.endpoint[:5] != 'auth.' \
-        and request.endpoint != 'static':
-       return redirect(url_for('auth.unconfirmed'))
-
-@auth.route('/unconfirmed')
-def unconfirmed():
-    if current_user.is_anonymous or current_user.confirmed:
-        return redirect(url_for('main.index'))
-    return render_template('auth/unconfirmed.html')
-
 
 @auth.route('/confirm')
 @login_required

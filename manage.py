@@ -1,17 +1,17 @@
 import os
 from app import create_app, db
-from app.models import User,Role
+from app.models import User,Role,Post
 from flask_script import Manager, Shell
 from flask_migrate import Migrate,MigrateCommand
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import Required
-from flask import Flask,render_template,session,  url_for, flash
+from flask import render_template,session,  url_for
 from flask import redirect
 from datetime import datetime
-from flask_mail import Mail, Message
-from threading import Thread
+from flask_mail import Mail
 from flask_login import login_required
+from app.email import send_email
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 manager = Manager(app)
@@ -19,7 +19,7 @@ migrate = Migrate(app, db)
 mail = Mail(app)
 
 def make_shell_context():
-    return dict(app=app,db=db,User=User,Role=Role)
+    return dict(app=app,db=db,User=User,Role=Role,Post=Post)
 manager.add_command('shell', Shell(make_context=make_shell_context))
 manager.add_command('db', MigrateCommand)
 
@@ -34,18 +34,7 @@ class NameForm(FlaskForm):
     name = StringField('输入姓名点击提交', validators=[Required()])
     submit = SubmitField('提交')
 
-def send_async_email(app, msg):
-    with app.app_context():
-        mail.send(msg)
 
-def send_email(to, subject,template, **kwargs):
-    msg = Message(app.config['FLASKY_SUBJECT_PREFIX'] + subject,
-                  sender=app.config['FLASKY_MAIL_SENDER'], recipients=[to])
-    msg.body = render_template(template + '.txt', **kwargs)
-    msg.html = render_template(template + '.html', **kwargs)
-    thr = Thread(target=send_async_email, args=[app, msg])
-    thr.start()
-    return thr
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
