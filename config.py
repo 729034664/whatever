@@ -2,13 +2,7 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
-    # SECRET_KEY = os.environ.get('SECRET_KEY') or 'zhang'
-    # SQLALCHEMY_COMMIT_ON_TEARDOWN = True
-    # FLASKY_MAIL_SUBJECT_PREFIX = 'Flasky'
-    # FLASKY_MAIL_SENDER = '729034664@qq.com'
-    # FLASKY_ADMIN = os.environ.get('729034664@qq.com')
-    # SQLALCHEMY_TRACK_MODIFICATIONS = False
-    #
+
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SECRET_KEY = 'zhang'
     MAIL_SERVER = 'smtp.163.com'
@@ -21,6 +15,8 @@ class Config:
     FLASKY_ADMIN = '18519357162@163.com'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     MAIL_DEBUG = True
+
+    FLASKY_POSTS_PER_PAGE = 10
 
     @staticmethod
     def init_app(app):
