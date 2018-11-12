@@ -8,17 +8,10 @@
 <div class="page-header">
     <h1>Hello, {% if current_user.is_authenticated %}{{ current_user.username }}{% else %}Stranger{% endif %}!</h1>
 </div>
-<form method="POST">
-    {{form.hidden_tag()}}
-    <p>{{form.body.label}}</p>
-    {{form.body()}}
-    {{ form.submit()}}
-    {{ pagedown.include_pagedown() }}
-</form>
 <div>
-    {% if current_user.can(Permission.WRITE) %}
+{#    {% if current_user.can(Permission.WRITE) %}#}
     {{ wtf.quick_form(form) }}
-    {% endif %}
+{#    {% endif %}#}
 </div>
 {% include '_posts.html' %}
 {% if pagination %}
@@ -32,6 +25,3 @@
 {{ super() }}
 {{ pagedown.include_pagedown() }}
 {% endblock %}
-
-
-
